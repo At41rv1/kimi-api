@@ -39,11 +39,11 @@ async def home():
 
             <h2>📌 Available Models</h2>
             <ul>
-                <li><code>DeepSeek-R1</code> → <small>deepseek-ai/DeepSeek-R1</small></li>
-                <li><code>DeepSeek-R1-0528</code> → <small>deepseek-ai/DeepSeek-R1-0528</small></li>
-                <li><code>DeepSeek-V3</code> → <small>deepseek-ai/DeepSeek-V3-0324</small></li>
-                <li><code>Llama4-Maverick-17B-lnstruct</code> → <small>meta-llama/Llama-4-Maverick-17B-128E-Instruct</small></li>
-                <li><code>Llama4-Scout-17B-16E-Instruct</code> → <small>meta-llama/Llama-4-Scout-17B-16E-Instruct</small></li>
+                <li><code>DeepSeek-R1</code></small></li>
+                <li><code>DeepSeek-R1-0528</code></small></li>
+                <li><code>DeepSeek-V3</code></small></li>
+                <li><code>Llama4-Maverick-17B-lnstruct</code</small></li>
+                <li><code>Llama4-Scout-17B-16E-Instruct</code></li>
             </ul>
 
             <h2>🔗 Endpoints</h2>
