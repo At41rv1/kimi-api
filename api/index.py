@@ -7,8 +7,15 @@ app = FastAPI()
 
 API_KEY = "4a6pMDyn.2Gm8ZhMYbojhpxAtgjMWFFxQ8Tbphxhf"
 BASE_URL = "https://inference.baseten.co/v1"
-REAL_MODEL = "moonshotai/Kimi-K2-Instruct"
-MODEL_NAME = "Kimi-AI"
+
+# Mapping of display names to real model names
+MODEL_MAPPING = {
+    "DeepSeek-R1": "deepseek-ai/DeepSeek-R1",
+    "DeepSeek-R1-0528": "deepseek-ai/DeepSeek-R1-0528",
+    "DeepSeek-V3": "deepseek-ai/DeepSeek-V3-0324",
+    "Llama4-Maverick-17B-lnstruct": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
+    "Llama4-Scout-17B-16E-Instruct": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+}
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
@@ -17,48 +24,56 @@ async def home():
         <head>
             <title>Kimi API</title>
             <style>
-                body { font-family: sans-serif; padding: 30px; background: #f9f9f9; }
-                h1 { color: #1d4ed8; }
-                code { background: #eee; padding: 4px 6px; border-radius: 4px; }
-                pre { background: #eee; padding: 10px; border-radius: 6px; }
+                body { font-family: 'Segoe UI', sans-serif; padding: 30px; background: #fdfdfd; color: #222; }
+                h1 { color: #1e40af; }
+                code { background: #f1f1f1; padding: 4px 6px; border-radius: 4px; }
+                pre { background: #f1f1f1; padding: 10px; border-radius: 6px; overflow: auto; }
+                .box { background: #e0ecff; border-left: 4px solid #1e40af; padding: 1em; margin-bottom: 1em; }
             </style>
         </head>
         <body>
-            <h1>✅ API IS ON - USE UNLIMITED</h1>
-            <p>This is a custom proxy to Kimi-AI running on Vercel.</p>
+            <h1>🚀 Kimi AI API Docs</h1>
+            <div class="box">
+                <strong>Status:</strong> <span style="color: green;">✅ API IS ON - USE UNLIMITED</span>
+            </div>
+
+            <h2>📌 Available Models</h2>
+            <ul>
+                <li><code>DeepSeek-R1</code> → <small>deepseek-ai/DeepSeek-R1</small></li>
+                <li><code>DeepSeek-R1-0528</code> → <small>deepseek-ai/DeepSeek-R1-0528</small></li>
+                <li><code>DeepSeek-V3</code> → <small>deepseek-ai/DeepSeek-V3-0324</small></li>
+                <li><code>Llama4-Maverick-17B-lnstruct</code> → <small>meta-llama/Llama-4-Maverick-17B-128E-Instruct</small></li>
+                <li><code>Llama4-Scout-17B-16E-Instruct</code> → <small>meta-llama/Llama-4-Scout-17B-16E-Instruct</small></li>
+            </ul>
 
             <h2>🔗 Endpoints</h2>
             <ul>
-                <li><code>GET /v1/models</code> — Returns available model</li>
-                <li><code>POST /v1/chat/completions</code> — Sends a chat message</li>
+                <li><code>GET /v1/models</code> — List available models</li>
+                <li><code>POST /v1/chat/completions</code> — Send chat request</li>
             </ul>
 
-            <h2>📥 Example Request (POST /v1/chat/completions) -- By At41rv--</h2>
+            <h2>📤 Example Request</h2>
             <pre>{
-  "model": "Kimi-AI",
+  "model": "DeepSeek-R1",
   "messages": [
-    {"role": "user", "content": "Who are you?"}
+    {"role": "user", "content": "Hello, who are you?"}
   ],
   "stream": false
 }</pre>
 
-            <h2>📤 Example Response</h2>
+            <h2>📥 Example Response</h2>
             <pre>{
-  "id": "...",
+  "id": "chatcmpl-xyz",
   "object": "chat.completion",
   "choices": [
     {
-      "index": 0,
       "message": {
         "role": "assistant",
-        "content": "I am Kimi, your intelligent assistant!"
-      },
-      ...
+        "content": "I am Kimi, your assistant!"
+      }
     }
   ]
 }</pre>
-
-            <p>Need help? Contact the creator or test it with <code>curl</code> or Python.</p>
         </body>
     </html>
     """
@@ -68,18 +83,21 @@ async def models():
     return {
         "object": "list",
         "data": [
-            {
-                "id": MODEL_NAME,
-                "object": "model",
-                "owned_by": "you"
-            }
+            {"id": display, "object": "model", "owned_by": "you"}
+            for display in MODEL_MAPPING.keys()
         ]
     }
 
 @app.post("/v1/chat/completions")
 async def chat(request: Request):
     body = await request.json()
-    body["model"] = REAL_MODEL
+    display_model = body.get("model")
+    real_model = MODEL_MAPPING.get(display_model)
+
+    if not real_model:
+        return JSONResponse(status_code=400, content={"error": "Unknown model name"})
+
+    body["model"] = real_model
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
@@ -88,9 +106,7 @@ async def chat(request: Request):
 
     async with httpx.AsyncClient(timeout=60.0) as client:
         if body.get("stream"):
-            async with client.stream(
-                "POST", f"{BASE_URL}/chat/completions", headers=headers, json=body
-            ) as r:
+            async with client.stream("POST", f"{BASE_URL}/chat/completions", headers=headers, json=body) as r:
                 async def streamer():
                     async for line in r.aiter_lines():
                         if line.strip():
