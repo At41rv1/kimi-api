@@ -32,7 +32,7 @@ async def home():
             </style>
         </head>
         <body>
-            <h1>🚀 Kimi AI API Docs</h1>
+            <h1>🚀 At41rv A7 API Docs</h1>
             <div class="box">
                 <strong>Status:</strong> <span style="color: green;">✅ API IS ON - USE UNLIMITED</span>
             </div>
