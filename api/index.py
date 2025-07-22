@@ -8,13 +8,14 @@ app = FastAPI()
 API_KEY = "4a6pMDyn.2Gm8ZhMYbojhpxAtgjMWFFxQ8Tbphxhf"
 BASE_URL = "https://inference.baseten.co/v1"
 
-# Mapping of display names to real model names
+# Mapping of display names (used by users) to real model names (sent to base URL)
 MODEL_MAPPING = {
+    "Kimi-K2": "moonshotai/Kimi-K2-Instruct",
     "DeepSeek-R1": "deepseek-ai/DeepSeek-R1",
     "DeepSeek-R1-0528": "deepseek-ai/DeepSeek-R1-0528",
     "DeepSeek-V3": "deepseek-ai/DeepSeek-V3-0324",
     "Llama4-Maverick-17B-lnstruct": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
-    "Llama4-Scout-17B-16E-Instruct": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+    "Llama4-Scout-17B-16E-lnstruct": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
 }
 
 @app.get("/", response_class=HTMLResponse)
@@ -32,30 +33,30 @@ async def home():
             </style>
         </head>
         <body>
-            <h1>🚀 At41rv A7 API Docs</h1>
+            <h1>🚀 Kimi AI API Docs</h1>
             <div class="box">
                 <strong>Status:</strong> <span style="color: green;">✅ API IS ON - USE UNLIMITED</span>
             </div>
 
             <h2>📌 Available Models</h2>
             <ul>
-                <li><code>DeepSeek-R1</code></small></li>
-                <li><code>DeepSeek-R1-0528</code></small></li>
-                <li><code>DeepSeek-V3</code></small></li>
-                <li><code>Llama4-Maverick-17B-lnstruct</code</small></li>
-                <li><code>Llama4-Scout-17B-16E-Instruct</code></li>
+                <li><code>Kimi-K2</code></li>
+                <li><code>DeepSeek-R1</code></li>
+                <li><code>DeepSeek-R1-0528</code></li>
+                <li><code>DeepSeek-V3</code></li>
+                <li><code>Llama4-Maverick-17B-lnstruct</code></li>
+                <li><code>Llama4-Scout-17B-16E-lnstruct</code></li>
             </ul>
 
             <h2>🔗 Endpoints</h2>
             <ul>
                 <li><code>GET /v1/models</code> — List available models</li>
-                <li><code>.</code></li>
                 <li><code>POST /v1/chat/completions</code> — Send chat request</li>
             </ul>
 
             <h2>📤 Example Request</h2>
             <pre>{
-  "model": "DeepSeek-R1",
+  "model": "Kimi-K2",
   "messages": [
     {"role": "user", "content": "Hello, who are you?"}
   ],
