@@ -49,6 +49,7 @@ async def home():
             <h2>🔗 Endpoints</h2>
             <ul>
                 <li><code>GET /v1/models</code> — List available models</li>
+                <li><code>.</code></li>
                 <li><code>POST /v1/chat/completions</code> — Send chat request</li>
             </ul>
 
