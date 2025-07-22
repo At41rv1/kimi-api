@@ -1,10 +1,11 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from openai import OpenAI
 from typing import Optional, List, Dict, Any, Literal
 import json
+import asyncio
 
 app = FastAPI()
 
@@ -42,7 +43,7 @@ class ChatMessage(BaseModel):
 class ChatCompletionRequest(BaseModel):
     model: str
     messages: List[ChatMessage]
-    stream: Optional[bool] = True
+    stream: Optional[bool] = False
     stop: Optional[List[str]] = Field(default_factory=list)
     top_p: Optional[float] = 1
     max_tokens: Optional[int] = 3000
@@ -50,64 +51,75 @@ class ChatCompletionRequest(BaseModel):
     presence_penalty: Optional[float] = 0
     frequency_penalty: Optional[float] = 0
 
-async def generate_stream(chat_request: ChatCompletionRequest):
+class ErrorResponse(BaseModel):
+    error: str
+
+@app.get("/v1/models")
+async def list_models():
     try:
-        messages_dict = [msg.dict() for msg in chat_request.messages]
+        return {
+            "object": "list",
+            "data": AVAILABLE_MODELS
+        }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Failed to list models: {str(e)}"}
+        )
+
+@app.post("/v1/chat/completions")
+async def chat_completions(chat_request: ChatCompletionRequest):
+    try:
+        messages_dict = [{"role": msg.role, "content": msg.content} for msg in chat_request.messages]
+        
         response = client.chat.completions.create(
             model=chat_request.model,
             messages=messages_dict,
             stop=chat_request.stop,
-            stream=True,
-            stream_options={
-                "include_usage": True,
-                "continuous_usage_stats": True
-            },
+            stream=False,  # Force non-streaming for Vercel compatibility
             top_p=chat_request.top_p,
             max_tokens=chat_request.max_tokens,
             temperature=chat_request.temperature,
             presence_penalty=chat_request.presence_penalty,
             frequency_penalty=chat_request.frequency_penalty
         )
-
-        for chunk in response:
-            if chunk.choices and chunk.choices[0].delta.content is not None:
-                yield f"data: {json.dumps({'content': chunk.choices[0].delta.content})}\n\n"
+        
+        # Convert the response to a dictionary and return
+        response_dict = {
+            "id": response.id,
+            "object": "chat.completion",
+            "created": response.created,
+            "model": response.model,
+            "choices": [{
+                "index": choice.index,
+                "message": {
+                    "role": choice.message.role,
+                    "content": choice.message.content
+                },
+                "finish_reason": choice.finish_reason
+            } for choice in response.choices],
+            "usage": {
+                "prompt_tokens": response.usage.prompt_tokens,
+                "completion_tokens": response.usage.completion_tokens,
+                "total_tokens": response.usage.total_tokens
+            }
+        }
+        
+        return JSONResponse(content=response_dict)
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/v1/models")
-async def list_models():
-    return JSONResponse({
-        "object": "list",
-        "data": AVAILABLE_MODELS
-    })
-
-@app.post("/v1/chat/completions")
-async def chat_completions(chat_request: ChatCompletionRequest):
-    if chat_request.stream:
-        return StreamingResponse(
-            generate_stream(chat_request),
-            media_type="text/event-stream"
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Chat completion failed: {str(e)}"}
         )
-    else:
-        try:
-            messages_dict = [msg.dict() for msg in chat_request.messages]
-            response = client.chat.completions.create(
-                model=chat_request.model,
-                messages=messages_dict,
-                stop=chat_request.stop,
-                stream=False,
-                top_p=chat_request.top_p,
-                max_tokens=chat_request.max_tokens,
-                temperature=chat_request.temperature,
-                presence_penalty=chat_request.presence_penalty,
-                frequency_penalty=chat_request.frequency_penalty
-            )
-            return JSONResponse(response.dict())
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 async def root():
-    return {"message": "DeepSeek Chat API is running. Use /v1/chat/completions for chat and /v1/models for available models."} 
+    return {
+        "status": "healthy",
+        "version": "1.0",
+        "endpoints": {
+            "models": "/v1/models",
+            "chat": "/v1/chat/completions"
+        }
+    } 
