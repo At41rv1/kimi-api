@@ -11,8 +11,8 @@ BASE_URL = "https://inference.baseten.co/v1"
 # Mapping of display names (used by users) to real model names (sent to base URL)
 MODEL_MAPPING = {
     "Kimi-K2": "moonshotai/Kimi-K2-Instruct",
-    "DeepSeek-R1": "deepseek-ai/DeepSeek-R1",
-    "DeepSeek-R1-0528": "deepseek-ai/DeepSeek-R1-0528",
+    "DeepSeek-R1-Think": "deepseek-ai/DeepSeek-R1",
+    "DeepSeek-R1-0528-Think": "deepseek-ai/DeepSeek-R1-0528",
     "DeepSeek-V3": "deepseek-ai/DeepSeek-V3-0324",
     "Llama4-Maverick-17B-lnstruct": "meta-llama/Llama-4-Maverick-17B-128E-Instruct",
     "Llama4-Scout-17B-16E-lnstruct": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
