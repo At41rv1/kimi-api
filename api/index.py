@@ -1,34 +1,63 @@
 from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse
 import httpx
-import os
 import asyncio
 
 app = FastAPI()
 
+# Hidden actual backend
 API_KEY = "4a6pMDyn.2Gm8ZhMYbojhpxAtgjMWFFxQ8Tbphxhf"
 BASE_URL = "https://inference.baseten.co/v1"
-MODEL_NAME = "moonshotai/Kimi-K2-Instruct"
+MODEL_NAME = "Kimi-AI"  # Public-facing name (can be anything you want)
 
-@app.post("/chat")
-async def proxy_chat(request: Request):
+@app.get("/", response_class=PlainTextResponse)
+async def root():
+    return "API IS ON - USE UNLIMITED"
+
+@app.get("/v1/models")
+async def get_models():
+    return {
+        "object": "list",
+        "data": [
+            {
+                "id": MODEL_NAME,
+                "object": "model",
+                "owned_by": "you"
+            }
+        ]
+    }
+
+@app.post("/v1/chat/completions")
+async def chat_proxy(request: Request):
     body = await request.json()
     
-    # Force model name override (hides it from users)
-    body["model"] = MODEL_NAME
+    # Override model to hidden real model name
+    body["model"] = "moonshotai/Kimi-K2-Instruct"
     
-    # Forward request to original API with real base_url
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+
     async with httpx.AsyncClient(timeout=60.0) as client:
-        async with client.stream(
-            "POST",
-            f"{BASE_URL}/chat/completions",
-            headers={"Authorization": f"Bearer {API_KEY}"},
-            json=body,
-        ) as response:
-            
-            async def stream_generator():
-                async for line in response.aiter_lines():
-                    if line.strip():
-                        yield line + "\n"
-            
-            return StreamingResponse(stream_generator(), media_type="text/event-stream")
+        if body.get("stream"):
+            # Handle streaming
+            async with client.stream(
+                "POST",
+                f"{BASE_URL}/chat/completions",
+                json=body,
+                headers=headers
+            ) as resp:
+                async def streamer():
+                    async for line in resp.aiter_lines():
+                        if line.strip():
+                            yield f"data: {line}\n\n"
+                return StreamingResponse(streamer(), media_type="text/event-stream")
+        else:
+            # Handle non-streaming
+            resp = await client.post(
+                f"{BASE_URL}/chat/completions",
+                json=body,
+                headers=headers
+            )
+            return JSONResponse(status_code=resp.status_code, content=resp.json())
