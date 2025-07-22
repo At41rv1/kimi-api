@@ -88,7 +88,7 @@ async def models():
     return {
         "object": "list",
         "data": [
-            {"id": display, "object": "model", "owned_by": "you"}
+            {"id": display, "object": "model", "owned_by": "At41rv"}
             for display in MODEL_MAPPING.keys()
         ]
     }
