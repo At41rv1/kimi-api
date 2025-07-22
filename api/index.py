@@ -33,7 +33,7 @@ async def home():
                 <li><code>POST /v1/chat/completions</code> — Sends a chat message</li>
             </ul>
 
-            <h2>📥 Example Request (POST /v1/chat/completions)</h2>
+            <h2>📥 Example Request (POST /v1/chat/completions) -- By At41rv--</h2>
             <pre>{
   "model": "Kimi-AI",
   "messages": [
