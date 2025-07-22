@@ -44,8 +44,8 @@ async def home():
             <h2>📌 Available Models</h2>
             <ul>
                 <li><code>Kimi-K2</code></li>
-                <li><code>DeepSeek-R1</code></li>
-                <li><code>DeepSeek-R1-0528</code></li>
+                <li><code>DeepSeek-R1-Think</code></li>
+                <li><code>DeepSeek-R1-0528-Think</code></li>
                 <li><code>DeepSeek-V3</code></li>
                 <li><code>Llama4-Maverick-17B-lnstruct</code></li>
                 <li><code>Llama4-Scout-17B-16E-lnstruct</code></li>
