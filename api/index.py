@@ -23,7 +23,7 @@ async def home():
     return """
     <html>
         <head>
-            <title>Kimi API</title>
+            <title>A7 API</title>
             <style>
                 body { font-family: 'Segoe UI', sans-serif; padding: 30px; background: #fdfdfd; color: #222; }
                 h1 { color: #1e40af; }
@@ -33,7 +33,10 @@ async def home():
             </style>
         </head>
         <body>
-            <h1>🚀 Kimi AI API Docs</h1>
+            <h1>🚀 A7 AI API Docs</h1>
+               <ul>
+                <li><code>BY At41rv</code></li>               
+            </ul>
             <div class="box">
                 <strong>Status:</strong> <span style="color: green;">✅ API IS ON - USE UNLIMITED</span>
             </div>
