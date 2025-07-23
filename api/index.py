@@ -23,7 +23,7 @@ async def home():
     return """
     <html>
     <head>
-        <title>Kimi API</title>
+        <title>At41rv A7 API</title>
         <style>
             body { font-family: Arial; padding: 30px; background: #fff; color: #111; }
             h1 { color: #1e40af; }
@@ -31,23 +31,31 @@ async def home():
         </style>
     </head>
     <body>
-        <h1>🚀 Kimi AI API Docs</h1>
-        <p>📌 Base URL: <code>https://inference.baseten.co/v1</code></p>
+        <h1>🚀 At41rv A7 AI API Docs</h1>
+        <p>📌 Base URL: <code>https://a7-at41rv.vercel.app</code></p>
         <h2>📍 Available Models:</h2>
         <ul>
             <li><code>Kimi-K2</code></li>
+            <li><code>.</code></li>
             <li><code>DeepSeek-R1-Think</code></li>
+            <li><code>.</code></li>
             <li><code>DeepSeek-R1-0528-Think</code></li>
+            <li><code>.</code></li>
             <li><code>DeepSeek-V3</code></li>
+            <li><code>.</code></li>
             <li><code>Llama4-Maverick-17B-lnstruct</code></li>
+            <li><code>.</code></li>
             <li><code>Llama4-Scout-17B-16E-lnstruct</code></li>
+            <li><code>.</code></li>
         </ul>
         <h2>🧠 Endpoints:</h2>
         <ul>
             <li><code>GET /v1/models</code> — List available models</li>
+            <li><code>.</code></li>
             <li><code>POST /v1/chat/completions</code> — Chat with model (set <code>"stream": true</code> to enable streaming)</li>
         </ul>
         <h2>💬 Example Request:</h2>
+            <li><code>.</code></li>
         <pre>{
   "model": "Kimi-K2",
   "messages": [{"role": "user", "content": "Hello!"}],
